@@ -167,21 +167,29 @@ No server required — everything runs client-side.
 
 ## 🧮 Formulas Used
 
-\[
+Daily energy:
+
+$$
 E_{zi} = \frac{1}{1000} \sum_{h=0}^{23} P(h)
-\]
+$$
 
-\[
+Monthly energy:
+
+$$
 E_{lună} = E_{zi} \times Zile
-\]
+$$
 
-\[
+Monthly cost:
+
+$$
 Cost_{lună} = E_{lună} \times Tarif
-\]
+$$
 
-\[
-CO₂_{lună} = E_{lună} \times Fact_{CO₂}
-\]
+CO₂ emissions:
+
+$$
+CO_{2(lună)} = E_{lună} \times Fact_{CO_{2}}
+$$
 
 ---
 
