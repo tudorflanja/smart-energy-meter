@@ -51,19 +51,21 @@ Each device is defined by:
 
 The total hourly power is computed as:
 
-\[
-P_{total}(h) = \sum_i N_i \times [P_{i,active}(h) + P_{i,standby}(h)]
-\]
+$$
+P_{total}(h) = \sum_i N_i \times [ P_{i,active}(h) + P_{i,standby}(h) ]
+$$
 
 Reactive power is estimated from:
-\[
+
+$$
 Q_i = P_i \times \tan(\arccos(PF_i))
-\]
+$$
 
 Then:
-\[
+
+$$
 PF_{total} \approx \frac{\sum P_i}{\sum \sqrt{P_i^2 + Q_i^2}}
-\]
+$$
 
 ---
 
