@@ -147,7 +147,5 @@ No server required — everything runs client-side.
 | File | Description |
 |------|--------------|
 | `smart_energy_meter_stacked.html` | Complete web app (HTML, CSS, JS integrated) |
-| `preview.png` | Screenshot of the running app |
 | `README.md` | Project documentation |
-| *(optional)* `documentatie_instrument_virtual.tex` | LaTeX report used for academic submission |
 
