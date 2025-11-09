@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Smart Energy Meter</title>
+<style>
+:root{
+  --ink:#0f172a; --muted:#475569; --bg:#fafafa; --panel:#ffffff; --line:#e5e7eb;
+  --accent:#0ea5a4; --danger:#b91c1c;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,Segoe UI,Roboto,Arial}
+header{padding:14px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
+h1{font-size:18px;margin:0}
+small{color:var(--muted)}
+
+main{max-width:900px;margin:auto;padding:14px;display:grid;gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
+label{font-weight:600;color:var(--muted)}
+.hr{height:1px;background:var(--line);margin:10px 0}
+.row{display:grid;grid-template-columns:170px 1fr;gap:8px;align-items:center;margin:6px 0}
+input[type="number"], input[type="text"], select{width:100%}
+button{cursor:pointer;border:1px solid var(--line);border-radius:8px;background:#fff;padding:.5rem .8rem}
+button.primary{background:var(--accent);border-color:#0a8b8a;color:#fff}
+button.danger{background:var(--danger);border-color:#8a1313;color:#fff}
+
+.kpi{display:grid;grid-template-columns:1fr;gap:8px}
+.kpi .tile{border:1px solid var(--line);border-radius:8px;background:#fff;padding:8px}
+.kpi .tile h3{margin:0 0 4px 0;font-size:13px;color:var(--muted)}
+.kpi .tile p{margin:0;font-weight:700}
+
+.note{color:var(--muted);font-size:13px}
+
+/* tabel */
+.table-wrap{overflow:auto;border-radius:8px}
+table{min-width:720px;width:100%;border-collapse:collapse;background:#fff}
+th,td{border:1px solid var(--line);padding:.45rem .5rem;text-align:left;white-space:nowrap}
+thead{background:#f1f5f9}
+td.num{text-align:right}
+tr td button{padding:.25rem .5rem}
+
+/* canvas responsive – o coloană, cu pad intern pe grafic pentru vizibilitate completă */
+.canvas-box{position:relative}
+canvas{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:10px;background:#fff}
+footer{padding:14px;text-align:center;color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Smart Energy Meter</h1>
+  <small></small>
+</header>
+
+<main>
+  <!-- 1) CONTROALE -->
+  <section class="card">
+    <h2 style="margin:0 0 8px 0;font-size:16px">Setări generale</h2>
+    <div class="row"><label>Tarif energie [lei/kWh]</label><input id="ui_price" type="number" min="0" step="0.01" value="0.85"></div>
+    <div class="row"><label>Zile / lună</label><input id="ui_days" type="number" min="1" max="31" value="30"></div>
+    <div class="row"><label>Emisie CO₂ [kg/kWh]</label><input id="ui_co2" type="number" min="0" step="0.001" value="0.25"></div>
+
+    <div class="hr"></div>
+
+    <h2 style="margin:0 0 8px 0;font-size:16px">Dispozitive</h2>
+    <div class="row">
+      <label>Preset</label>
+      <select id="ui_preset">
+        <option value="">— alege —</option>
+        <option value='{"name":"Frigider","P":120,"pf":0.9,"qty":1,"on1":0,"dur1":24,"on2":0,"dur2":0,"standby":0}'>Frigider (120 W, 24/24)</option>
+        <option value='{"name":"TV LED","P":80,"pf":0.95,"qty":1,"on1":19,"dur1":4,"on2":0,"dur2":0,"standby":3}'>TV LED (80 W seara + 3 W standby)</option>
+        <option value='{"name":"Laptop","P":60,"pf":0.95,"qty":1,"on1":10,"dur1":6,"on2":0,"dur2":0,"standby":2}'>Laptop (60 W, 6h/zi)</option>
+        <option value='{"name":"Mașină spălat","P":2000,"pf":0.85,"qty":1,"on1":20,"dur1":1,"on2":0,"dur2":0,"standby":1}'>Mașină spălat (1h/zi)</option>
+        <option value='{"name":"Aer condiționat","P":900,"pf":0.9,"qty":1,"on1":18,"dur1":5,"on2":0,"dur2":0,"standby":1}'>Aer condiționat (900 W, seara)</option>
+        <option value='{"name":"Bec LED","P":10,"pf":1.0,"qty":6,"on1":19,"dur1":5,"on2":6,"dur2":1,"standby":0}'>Iluminat LED (6×10 W)</option>
+      </select>
+    </div>
+    <div class="row"><label></label><button class="primary" id="btn_add">Adaugă dispozitiv</button></div>
+  </section>
+
+  <!-- 2) KPI -->
+  <section class="card">
+    <h2 style="margin:0 0 8px 0;font-size:16px">Indicatori (valori curente)</h2>
+    <div class="kpi">
+      <div class="tile"><h3>Putere medie zilnică</h3><p id="kpi_Pavg">— W</p></div>
+      <div class="tile"><h3>Energie/zi</h3><p id="kpi_day">— kWh</p></div>
+      <div class="tile"><h3>Energie/lună</h3><p id="kpi_month">— kWh</p></div>
+      <div class="tile"><h3>Cost/lună</h3><p id="kpi_cost">— lei</p></div>
+      <div class="tile"><h3>PF mediu (aprox.)</h3><p id="kpi_pf">—</p></div>
+      <div class="tile"><h3>CO₂/lună</h3><p id="kpi_co2">— kg</p></div>
+    </div>
+  </section>
+
+  <!-- 3) GRAFIC ZILNIC -->
+  <section class="card">
+    <h2 style="margin:0 0 8px 0;font-size:16px">Profil zilnic de sarcină (putere pe ore)</h2>
+    <div class="canvas-box">
+      <!-- raport de aspect puțin mai mare pentru vizibilitate -->
+      <canvas id="cv_line" data-ratio="0.5"></canvas>
+    </div>
+  </section>
+
+  <!-- 4) PIE + LEGENDĂ -->
+  <section class="card">
+    <h2 style="margin:0 0 8px 0;font-size:16px">Împărțirea energiei/lună pe dispozitive</h2>
+    <div class="canvas-box">
+      <canvas id="cv_pie" data-ratio="0.6"></canvas>
+    </div>
+    <div id="legend" class="note" style="margin-top:6px"></div>
+  </section>
+
+  <!-- 5) TABEL DISPOZITIVE -->
+  <section class="card">
+    <h2 style="margin:0 0 8px 0;font-size:16px">Listă dispozitive</h2>
+    <div class="table-wrap">
+      <table id="tbl">
+        <thead>
+          <tr>
+            <th>Dispozitiv</th><th>P [W]</th><th>PF</th><th>Nr</th>
+            <th>ON1</th><th>Dur1</th><th>ON2</th><th>Dur2</th><th>Standby [W]</th><th>Șterge</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <p class="note">ON1/ON2 = ora de start (0–23), Dur = durată în ore întregi; dacă Dur=0, intervalul e ignorat.</p>
+  </section>
+</main>
+
+<footer>© 2025 • Smart Energy Meter</footer>
+
+<script>
+/* ===== Canvas responsive ===== */
+function fitCanvasToParent(canvas){
+  const ratio = Number(canvas.dataset.ratio || 0.5);
+  const parent = canvas.parentElement;
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
+  const w = Math.floor(parent.clientWidth);
+  const h = Math.floor(w * ratio);
+  canvas.style.width = w + 'px';
+  canvas.style.height = h + 'px';
+  canvas.width = Math.floor(w * dpr);
+  canvas.height = Math.floor(h * dpr);
+  const ctx = canvas.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+
+/* ===== Util ===== */
+const fmt = (v, unit='')=>{
+  if(!Number.isFinite(v)) return '—' + (unit?(' '+unit):'');
+  const a=Math.abs(v); let s;
+  if(a===0) s='0';
+  else if(a<1) s=v.toFixed(3);
+  else if(a<10) s=v.toFixed(2);
+  else if(a<100) s=v.toFixed(1);
+  else s=String(Math.round(v));
+  return s + (unit?(' '+unit):'');
+};
+const clamp01=x=>Math.max(0,Math.min(1,x));
+const colorCycle=i=>['#0ea5a4','#2563eb','#b91c1c','#d97706','#7c3aed','#059669','#dc2626','#1d4ed8','#16a34a','#a855f7'][i%10];
+const niceCeil = (v, step)=> Math.ceil(v/step)*step;
+
+/* ===== Model ===== */
+class Dispozitiv{
+  constructor({name='Dispozitiv', P=100, pf=0.95, qty=1, on1=19, dur1=4, on2=0, dur2=0, standby=0}={}){
+    this.name=name; this.P=+P; this.pf=+pf; this.qty=+qty;
+    this.on1=+on1; this.dur1=+dur1; this.on2=+on2; this.dur2=+dur2; this.standby=+standby;
+  }
+  activLaOra(h){
+    const in1=(this.dur1>0)?this.inInterval(h,this.on1,this.dur1):false;
+    const in2=(this.dur2>0)?this.inInterval(h,this.on2,this.dur2):false;
+    return in1||in2;
+  }
+  inInterval(h,start,dur){
+    const end=(start+dur)%24;
+    if(dur>=24) return true;
+    if(start+dur<=24) return h>=start&&h<start+dur;
+    return (h>=start&&h<24)||(h>=0&&h<end);
+  }
+  P_ora(h){
+    const active=this.activLaOra(h)?this.P:0;
+    const base=(this.standby>0&&!this.activLaOra(h))?this.standby:0;
+    return (active+base)*this.qty;
+  }
+  Q_ora(h){ const Pnow=this.P_ora(h); const phi=Math.acos(clamp01(this.pf||1)); return Pnow*Math.tan(phi); }
+  energieZi(){ let Wh=0; for(let h=0;h<24;h++) Wh+=this.P_ora(h); return Wh/1000; }
+}
+
+class ContorInteligent{
+  constructor(cvLine,cvPie,legendEl){
+    this.devices=[]; this.price=0.85; this.days=30; this.co2=0.25;
+    this.cvLine=cvLine; this.cvPie=cvPie; this.ctxL=cvLine.getContext('2d'); this.ctxP=cvPie.getContext('2d'); this.legendEl=legendEl;
+  }
+  adauga(d){this.devices.push(d);} sterge(i){this.devices.splice(i,1);}
+  profilZilnic(){ const P=Array(24).fill(0),Q=Array(24).fill(0); this.devices.forEach(d=>{for(let h=0;h<24;h++){P[h]+=d.P_ora(h);Q[h]+=d.Q_ora(h);}}); return {P,Q}; }
+  energiiPeDispozitiv(){ return this.devices.map(d=>d.energieZi()*this.days); }
+  totaluri(){ const {P,Q}=this.profilZilnic(); const Pavg=P.reduce((a,b)=>a+b,0)/24; const day=P.reduce((a,b)=>a+b,0)/1000; const month=day*this.days; const cost=month*this.price; let sP=0,sS=0; for(let h=0;h<24;h++){const p=P[h],q=Q[h],s=Math.hypot(p,q); sP+=p; sS+=s;} const pf=sS>0?sP/sS:1; const co2=month*this.co2; return {Pavg: Pavg, day_kWh: day, month_kWh: month, cost, pf, co2}; }
+  afiseazaKPI(){ const k=this.totaluri(); kpi_Pavg.textContent=fmt(k.Pavg,'W'); kpi_day.textContent=fmt(k.day_kWh,'kWh'); kpi_month.textContent=fmt(k.month_kWh,'kWh'); kpi_cost.textContent=fmt(k.cost,'lei'); kpi_pf.textContent=fmt(k.pf,''); kpi_co2.textContent=fmt(k.co2,'kg'); }
+
+  /* ===== GRAFIC – vizibilitate completă cu pad și axe ===== */
+deseneazaLoadCurve(){
+  const {P}=this.profilZilnic();
+  const ctx=this.ctxL, W=ctx.canvas.width, H=ctx.canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  const pad = {l:50, r:12, t:20, b:36};
+  const plotW = W - pad.l - pad.r;
+  const plotH = H - pad.t - pad.b;
+
+  // grilaj
+  ctx.save();
+  ctx.strokeStyle='#e5e7eb';
+  ctx.lineWidth=1;
+  for(let i=0;i<=24;i++){
+    const x = pad.l + (i/24)*plotW;
+    ctx.beginPath(); ctx.moveTo(x,pad.t); ctx.lineTo(x,pad.t+plotH); ctx.stroke();
+  }
+  for(let i=0;i<=8;i++){
+    const y = pad.t + (i/8)*plotH;
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+plotW,y); ctx.stroke();
+  }
+  ctx.restore();
+
+  // scalare Y
+  const rawMax = Math.max(100,...P);
+  const step = rawMax<500 ? 50 : 100;
+  const Pmax = Math.ceil(rawMax/step)*step;
+
+  const X=h=> pad.l + h*(plotW/23);
+  const Y=p=> pad.t + (1 - (p/Pmax))*plotH;
+
+  // axe
+  ctx.strokeStyle='#334155';
+  ctx.lineWidth=1;
+  ctx.beginPath();
+  ctx.moveTo(pad.l,pad.t); ctx.lineTo(pad.l,pad.t+plotH); // Y
+  ctx.moveTo(pad.l,pad.t+plotH); ctx.lineTo(pad.l+plotW,pad.t+plotH); // X
+  ctx.stroke();
+
+  // ticks & etichete
+  ctx.fillStyle='#0f172a';
+  ctx.font='12px system-ui';
+  ctx.textAlign='center'; ctx.textBaseline='top';
+  for(let h=0;h<=23;h+=3){ const x=X(h); ctx.fillText(String(h), x, pad.t+plotH+6); }
+  ctx.textAlign='right'; ctx.textBaseline='middle';
+  for(let i=0;i<=8;i++){
+    const y = pad.t + (1 - i/8)*plotH;
+    const val = (Pmax*i/8);
+    ctx.fillText(String(Math.round(val)), pad.l-6, y);
+  }
+
+  // etichete AXE
+  ctx.save();
+  ctx.fillStyle='#0f172a';
+  ctx.font='13px system-ui';
+  // X – jos, centru
+  ctx.textAlign='center';
+  ctx.textBaseline='bottom';
+  ctx.fillText('Ore (0–23)', pad.l + plotW/2, H - 4);
+  // Y – rotit
+  ctx.save();
+  ctx.translate(16, pad.t + plotH/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.textAlign='center';
+  ctx.fillText('Putere [W]', 0, 0);
+  ctx.restore();
+  ctx.restore();
+
+  // linia de putere
+  ctx.strokeStyle='#2563eb';
+  ctx.lineWidth=2.5;
+  ctx.beginPath();
+  for(let h=0;h<24;h++){
+    const x=X(h), y=Y(P[h]);
+    if(h===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+}
+
+
+  deseneazaPie(){
+    const energies=this.energiiPeDispozitiv();
+    const total=energies.reduce((a,b)=>a+b,0);
+    const ctx=this.ctxP,W=ctx.canvas.width,H=ctx.canvas.height;
+    ctx.clearRect(0,0,W,H);
+    const cx=W/2,cy=H/2,R=Math.min(W,H)*0.38;
+    if(total<=0){ctx.fillStyle='#64748b'; ctx.textAlign='center'; ctx.fillText('Fără date',cx,cy); this.legendEl.innerHTML='(nicio energie)'; return;}
+    let start=-Math.PI/2; this.legendEl.innerHTML='';
+    this.devices.forEach((d,i)=>{
+      const v=energies[i], frac=v/total, end=start+frac*2*Math.PI;
+      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.fillStyle=colorCycle(i);
+      ctx.arc(cx,cy,R,start,end); ctx.closePath(); ctx.fill(); start=end;
+      const sw=`<span style="display:inline-block;width:10px;height:10px;background:${colorCycle(i)};border-radius:2px;margin-right:6px"></span>`;
+      this.legendEl.innerHTML += `<div>${sw} ${d.name}: ${fmt(v,'kWh')}</div>`;
+    });
+    ctx.strokeStyle='#334155'; ctx.lineWidth=1; ctx.beginPath(); ctx.arc(cx,cy,R,0,2*Math.PI); ctx.stroke();
+  }
+
+  actualizeazaTot(){ this.afiseazaKPI(); this.deseneazaLoadCurve(); this.deseneazaPie(); }
+}
+
+/* ===== App ===== */
+const meter=new ContorInteligent(cv_line,cv_pie,document.getElementById('legend'));
+[ new Dispozitiv({name:'Frigider',P:120,pf:0.9,qty:1,on1:0,dur1:24,standby:0}),
+  new Dispozitiv({name:'TV LED',P:80,pf:0.95,qty:1,on1:19,dur1:4,standby:3}),
+  new Dispozitiv({name:'Iluminat LED',P:10,pf:1,qty:6,on1:19,dur1:5,on2:6,dur2:1})
+].forEach(d=>meter.adauga(d));
+
+/* tabel */
+function renderTable(){
+  const tb=document.getElementById('tbody'); tb.innerHTML='';
+  meter.devices.forEach((d,idx)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td><input type="text" value="${d.name}" data-f="name"></td>
+      <td><input type="number" value="${d.P}" step="1" data-f="P" class="num"></td>
+      <td><input type="number" value="${d.pf}" step="0.01" data-f="pf" class="num"></td>
+      <td><input type="number" value="${d.qty}" step="1" min="1" data-f="qty" class="num"></td>
+      <td><input type="number" value="${d.on1}" step="1" min="0" max="23" data-f="on1" class="num"></td>
+      <td><input type="number" value="${d.dur1}" step="1" min="0" max="24" data-f="dur1" class="num"></td>
+      <td><input type="number" value="${d.on2}" step="1" min="0" max="23" data-f="on2" class="num"></td>
+      <td><input type="number" value="${d.dur2}" step="1" min="0" max="24" data-f="dur2" class="num"></td>
+      <td><input type="number" value="${d.standby}" step="1" min="0" data-f="standby" class="num"></td>
+      <td><button class="danger" data-del="${idx}">X</button></td>`;
+    tr.querySelectorAll('input').forEach(inp=>{
+      inp.addEventListener('input',()=>{ const f=inp.dataset.f; meter.devices[idx][f]=(inp.type==='text'?inp.value:+inp.value); meter.actualizeazaTot(); });
+    });
+    tr.querySelector('button[data-del]').addEventListener('click',()=>{ meter.sterge(idx); renderTable(); meter.actualizeazaTot(); });
+    tb.appendChild(tr);
+  });
+}
+
+/* UI */
+ui_price.addEventListener('input',e=>{ meter.price=+e.target.value; meter.actualizeazaTot(); });
+ui_days .addEventListener('input',e=>{ meter.days =+e.target.value; meter.actualizeazaTot(); });
+ui_co2  .addEventListener('input',e=>{ meter.co2  =+e.target.value; meter.actualizeazaTot(); });
+btn_add .addEventListener('click', ()=>{
+  const sel=ui_preset;
+  if(sel.value){ meter.adauga(new Dispozitiv(JSON.parse(sel.value))); }
+  else{ meter.adauga(new Dispozitiv({name:'Nou',P:100,pf:0.95,qty:1,on1:18,dur1:2,standby:0})); }
+  renderTable(); meter.actualizeazaTot();
+});
+
+/* ===== Resize handling ===== */
+const canvases=[cv_line,cv_pie];
+function resizeAll(){ canvases.forEach(fitCanvasToParent); meter.actualizeazaTot(); }
+window.addEventListener('resize', resizeAll);
+document.addEventListener('DOMContentLoaded', resizeAll);
+
+/* start */
+renderTable();
+resizeAll();
+</script>
+</body>
+</html>
