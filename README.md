@@ -1,1 +1,93 @@
-# smart-energy-meter
+# ⚡ Smart Energy Meter — Virtual Instrument for Household Power Analysis
+
+This project implements an interactive **web-based virtual instrument** for analyzing household electricity consumption.  
+It allows users to **add and simulate electrical devices**, visualize their **daily load curve**, estimate **monthly cost**, **CO₂ footprint**, and compute an **approximate power factor (PF)** — all in real time.
+
+Built entirely in **HTML, CSS, and JavaScript (OOP)**, the project runs directly in the browser without any backend dependencies.
+
+---
+
+## 🏠 Overview
+
+The Smart Energy Meter helps users understand and optimize their energy usage by:
+- Simulating household devices and their daily operation schedules
+- Displaying total active power for each hour of the day
+- Estimating total energy consumption, monthly costs, and CO₂ emissions
+- Visualizing data through an interactive **load curve** and **energy distribution pie chart**
+
+---
+
+## ⚙️ Core Features
+
+- 📊 **Real-time energy metrics**
+  - Active power, daily and monthly energy
+  - Cost estimation and carbon footprint
+  - Power factor (PF) approximation based on device reactive load
+
+- 🧩 **OOP Architecture**
+  - `Dispozitiv` class — models an electrical appliance  
+  - `ContorInteligent` class — aggregates all devices and performs calculations  
+  - `afiseazaKPI()` method — dedicated for displaying current values (explicit per project requirement)
+
+- 🖼️ **Dynamic Visualizations (HTML5 Canvas)**
+  - **Load curve** — total hourly active power for a 24h cycle  
+  - **Energy pie chart** — share of each device in total monthly energy
+
+- ⚙️ **User Interaction**
+  - Editable device table (add, modify, delete)
+  - Built-in presets (fridge, TV, laptop, air conditioner, washing machine, lights)
+  - Adjustable tariff, number of days, and CO₂ factor
+
+---
+
+## 🧠 How It Works
+
+Each device is defined by:
+- Nominal power `P` (W)
+- Power factor `PF`
+- Quantity `Nr`
+- Two optional operating intervals (`ON1–Dur1`, `ON2–Dur2`)
+- Standby power when idle
+
+The total hourly power is computed as:
+
+\[
+P_{total}(h) = \sum_i N_i \times [P_{i,active}(h) + P_{i,standby}(h)]
+\]
+
+Reactive power is estimated from:
+\[
+Q_i = P_i \times \tan(\arccos(PF_i))
+\]
+
+Then:
+\[
+PF_{total} \approx \frac{\sum P_i}{\sum \sqrt{P_i^2 + Q_i^2}}
+\]
+
+---
+
+## 📊 Example Output
+
+| Metric | Example Value |
+|:--|--:|
+| Average Power | 136 W |
+| Energy/day | 3.26 kWh |
+| Energy/month | 97.8 kWh |
+| Cost/month | 83.1 lei |
+| PF (approx.) | 0.932 |
+| CO₂/month | 24.4 kg |
+
+---
+
+## 🧩 OOP Structure
+
+### Class `Dispozitiv`
+Represents a household device with properties:
+```js
+class Dispozitiv {
+  constructor({name, P, pf, qty, on1, dur1, on2, dur2, standby}) { ... }
+  P_ora(h)        // active power at hour h
+  Q_ora(h)        // reactive power estimate
+  energieZi()     // daily energy (kWh)
+}
