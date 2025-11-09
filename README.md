@@ -149,3 +149,46 @@ No server required — everything runs client-side.
 | `smart_energy_meter_stacked.html` | Complete web app (HTML, CSS, JS integrated) |
 | `README.md` | Project documentation |
 
+---
+
+## 💡 Example Preset Devices
+
+| Device | Power (W) | PF | Hours/day | Standby (W) |
+|--------|------------|----|------------|--------------|
+| Fridge | 120 | 0.9 | 24 | 0 |
+| TV LED | 80 | 0.95 | 4 | 3 |
+| Laptop | 60 | 0.95 | 6 | 2 |
+| AC | 900 | 0.9 | 5 | 1 |
+| Lights | 6×10 | 1.0 | 6 | 0 |
+
+---
+
+## 🧮 Formulas Used
+
+\[
+E_{zi} = \frac{1}{1000} \sum_{h=0}^{23} P(h)
+\]
+
+\[
+E_{lună} = E_{zi} \times Zile
+\]
+
+\[
+Cost_{lună} = E_{lună} \times Tarif
+\]
+
+\[
+CO₂_{lună} = E_{lună} \times Fact_{CO₂}
+\]
+
+---
+
+## 🧰 Technologies Used
+
+- **HTML5** – Structure and layout  
+- **CSS3 (Grid & Flex)** – Styling and responsive design  
+- **JavaScript (OOP)** – Core logic and visualization  
+- **Canvas API** – Custom chart rendering  
+- **ResizeObserver API** – Dynamic canvas scaling  
+
+
