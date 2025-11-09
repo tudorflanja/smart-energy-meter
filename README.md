@@ -113,3 +113,41 @@ class ContorInteligent {
 - **Load Curve (Line Chart)** — total active power vs. hour (0–23)  
 - **Energy Pie Chart** — share of monthly energy per device  
 - Fully redrawn dynamically using Canvas with `ResizeObserver`
+
+---
+
+## 🧭 Running the Project
+
+### Option 1 — Local (Recommended)
+
+1. **Download or clone this repository:**
+
+```bash
+git clone https://github.com/your-username/smart-energy-meter.git
+```
+
+2. **Open** `smart_energy_meter_stacked.html` **in your browser.**
+
+No server required — everything runs client-side.
+
+---
+
+### Option 2 — GitHub Pages
+
+1. Push this project to your GitHub repository.  
+2. Go to **Settings → Pages → Source: main branch.**  
+3. Your app will be live at:
+
+👉 [https://your-username.github.io/smart-energy-meter](https://your-username.github.io/smart-energy-meter)
+
+---
+
+## 📁 Files in This Repository
+
+| File | Description |
+|------|--------------|
+| `smart_energy_meter_stacked.html` | Complete web app (HTML, CSS, JS integrated) |
+| `preview.png` | Screenshot of the running app |
+| `README.md` | Project documentation |
+| *(optional)* `documentatie_instrument_virtual.tex` | LaTeX report used for academic submission |
+
