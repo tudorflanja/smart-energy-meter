@@ -91,3 +91,25 @@ class Dispozitiv {
   Q_ora(h)        // reactive power estimate
   energieZi()     // daily energy (kWh)
 }
+```
+### 🧩 Class `ContorInteligent`
+Handles all devices and performs global calculations:
+```js
+class ContorInteligent {
+  adauga(dispozitiv)
+  profilZilnic()          // 24h power profile
+  energiiPeDispozitiv()   // kWh/month per device
+  totaluri()              // aggregate KPIs
+  afiseazaKPI()           // displays current values
+  deseneazaLoadCurve()    // draws load curve (line chart)
+  deseneazaPie()          // draws energy distribution pie chart
+}
+```
+
+---
+
+## 🖼️ Visualizations
+
+- **Load Curve (Line Chart)** — total active power vs. hour (0–23)  
+- **Energy Pie Chart** — share of monthly energy per device  
+- Fully redrawn dynamically using Canvas with `ResizeObserver`
