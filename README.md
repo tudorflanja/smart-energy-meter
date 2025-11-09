@@ -189,6 +189,17 @@ CO₂_{lună} = E_{lună} \times Fact_{CO₂}
 - **CSS3 (Grid & Flex)** – Styling and responsive design  
 - **JavaScript (OOP)** – Core logic and visualization  
 - **Canvas API** – Custom chart rendering  
-- **ResizeObserver API** – Dynamic canvas scaling  
+- **ResizeObserver API** – Dynamic canvas scaling
 
+---
 
+## 📝 Conclusion
+
+The **Smart Energy Meter** provides a clear, interactive way to understand household energy behavior.  
+It combines **data modeling**, **visual analytics**, and **environmental impact estimation** in a single educational tool.
+
+### Possible extensions:
+- 🔌 Trifazic simulation  
+- 🌱 Energy efficiency suggestions  
+- 📊 Data export (CSV or PDF)  
+- 🌐 Integration with IoT sensors  
