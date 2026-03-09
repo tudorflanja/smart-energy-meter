@@ -209,7 +209,7 @@ The **Smart Energy Meter** provides a clear, interactive way to understand house
 It combines **data modeling**, **visual analytics**, and **environmental impact estimation** in a single educational tool.
 
 ### Possible extensions:
-- 🔌 Trifazic simulation  
-- 🌱 Energy efficiency suggestions  
-- 📊 Data export (CSV or PDF)  
-- 🌐 Integration with IoT sensors  
+- Trifazic simulation  
+- Energy efficiency suggestions  
+- Data export (CSV or PDF)  
+- Integration with IoT sensors  
