@@ -1,4 +1,4 @@
-# ⚡ Smart Energy Meter — Virtual Instrument for Household Power Analysis
+# Smart Energy Meter — Virtual Instrument for Household Power Analysis
 
 This project implements an interactive **web-based virtual instrument** for analyzing household electricity consumption.  
 It allows users to **add and simulate electrical devices**, visualize their **daily load curve**, estimate **monthly cost**, **CO₂ footprint**, and compute an **approximate power factor (PF)** — all in real time.
@@ -7,7 +7,7 @@ Built entirely in **HTML, CSS, and JavaScript (OOP)**, the project runs directly
 
 ---
 
-## 🏠 Overview
+## Overview
 
 The Smart Energy Meter helps users understand and optimize their energy usage by:
 - Simulating household devices and their daily operation schedules
@@ -17,30 +17,30 @@ The Smart Energy Meter helps users understand and optimize their energy usage by
 
 ---
 
-## ⚙️ Core Features
+## Core Features
 
-- 📊 **Real-time energy metrics**
+- **Real-time energy metrics**
   - Active power, daily and monthly energy
   - Cost estimation and carbon footprint
   - Power factor (PF) approximation based on device reactive load
 
-- 🧩 **OOP Architecture**
+- **OOP Architecture**
   - `Dispozitiv` class — models an electrical appliance  
   - `ContorInteligent` class — aggregates all devices and performs calculations  
   - `afiseazaKPI()` method — dedicated for displaying current values (explicit per project requirement)
 
-- 🖼️ **Dynamic Visualizations (HTML5 Canvas)**
+- **Dynamic Visualizations (HTML5 Canvas)**
   - **Load curve** — total hourly active power for a 24h cycle  
   - **Energy pie chart** — share of each device in total monthly energy
 
-- ⚙️ **User Interaction**
+- **User Interaction**
   - Editable device table (add, modify, delete)
   - Built-in presets (fridge, TV, laptop, air conditioner, washing machine, lights)
   - Adjustable tariff, number of days, and CO₂ factor
 
 ---
 
-## 🧠 How It Works
+## How It Works
 
 Each device is defined by:
 - Nominal power `P` (W)
@@ -69,7 +69,7 @@ $$
 
 ---
 
-## 📊 Example Output
+## Example Output
 
 | Metric | Example Value |
 |:--|--:|
@@ -82,7 +82,7 @@ $$
 
 ---
 
-## 🧩 OOP Structure
+## OOP Structure
 
 ### Class `Dispozitiv`
 Represents a household device with properties:
@@ -94,7 +94,7 @@ class Dispozitiv {
   energieZi()     // daily energy (kWh)
 }
 ```
-### 🧩 Class `ContorInteligent`
+### Class `ContorInteligent`
 Handles all devices and performs global calculations:
 ```js
 class ContorInteligent {
@@ -110,7 +110,7 @@ class ContorInteligent {
 
 ---
 
-## 🖼️ Visualizations
+## Visualizations
 
 - **Load Curve (Line Chart)** — total active power vs. hour (0–23)  
 - **Energy Pie Chart** — share of monthly energy per device  
@@ -118,7 +118,7 @@ class ContorInteligent {
 
 ---
 
-## 🧭 Running the Project
+## Running the Project
 
 ### Option 1 — Local (Recommended)
 
@@ -140,11 +140,11 @@ No server required — everything runs client-side.
 2. Go to **Settings → Pages → Source: main branch.**  
 3. Your app will be live at:
 
-👉 [https://your-username.github.io/smart-energy-meter](https://your-username.github.io/smart-energy-meter)
+[https://your-username.github.io/smart-energy-meter](https://your-username.github.io/smart-energy-meter)
 
 ---
 
-## 📁 Files in This Repository
+## Files in This Repository
 
 | File | Description |
 |------|--------------|
@@ -153,7 +153,7 @@ No server required — everything runs client-side.
 
 ---
 
-## 💡 Example Preset Devices
+## Example Preset Devices
 
 | Device | Power (W) | PF | Hours/day | Standby (W) |
 |--------|------------|----|------------|--------------|
@@ -165,7 +165,7 @@ No server required — everything runs client-side.
 
 ---
 
-## 🧮 Formulas Used
+## Formulas Used
 
 Daily energy:
 
@@ -193,7 +193,7 @@ $$
 
 ---
 
-## 🧰 Technologies Used
+## Technologies Used
 
 - **HTML5** – Structure and layout  
 - **CSS3 (Grid & Flex)** – Styling and responsive design  
@@ -203,7 +203,7 @@ $$
 
 ---
 
-## 📝 Conclusion
+## Conclusion
 
 The **Smart Energy Meter** provides a clear, interactive way to understand household energy behavior.  
 It combines **data modeling**, **visual analytics**, and **environmental impact estimation** in a single educational tool.
